@@ -304,21 +304,21 @@ class XMLtoJSON():
 # when you set 'input' to StringIO.StringIO io.StringIO
 # The value that will be parsed is just the value that have already written by the time when set_input() called.
 
-DIRECTORY = "d:\\tsddata\\"
+DIRECTORY = "/Users/yasuaki/Documents/"
 
 
 if __name__ == "__main__":
 
-    d = date(2013, 1, 1)
+    d = date(2013, 4, 16)
 #    d = date.today() - timedelta(days=1)
     strdate = d.strftime("%Y%m%d")
     
     con = Connection('localhost', 27017)
     db = con.finance
-    col = db.finance
+    col = db.affairs
     
     while(True):
-        strdirectory = DIRECTORY + strdate + '\\'
+        strdirectory = DIRECTORY + strdate + '/'
         if os.path.exists(strdirectory ) == True:
             filelist = os.listdir(strdirectory)
             for filename in filelist:
