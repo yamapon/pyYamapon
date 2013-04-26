@@ -304,12 +304,12 @@ class XMLtoJSON():
 # when you set 'input' to StringIO.StringIO io.StringIO
 # The value that will be parsed is just the value that have already written by the time when set_input() called.
 
-DIRECTORY = "/Users/yasuaki/Documents/"
+DIRECTORY = "/Users/admin/Documents/"
 
 
 if __name__ == "__main__":
 
-    d = date(2013, 4, 16)
+    d = date(2010, 5, 1)
 #    d = date.today() - timedelta(days=1)
     strdate = d.strftime("%Y%m%d")
     
