@@ -58,6 +58,8 @@ class XMLtoJSON_ContentHandler(xml.sax.handler.ContentHandler):
         def this_push_text_node(node, continued_p):
  
             node = node.rstrip('\t\n')
+            node = node.replace( '\t' , ' ' )
+            node = node.replace( '\\', 'JPY' )
  
             data = this_data['d']
             if not data.get('#text'):
@@ -309,7 +311,7 @@ DIRECTORY = "/Users/admin/Documents/"
 
 if __name__ == "__main__":
 
-    d = date(2010, 5, 1)
+    d = date(2009,1, 7)
 #    d = date.today() - timedelta(days=1)
     strdate = d.strftime("%Y%m%d")
     
@@ -321,27 +323,37 @@ if __name__ == "__main__":
         strdirectory = DIRECTORY + strdate + '/'
         if os.path.exists(strdirectory ) == True:
             filelist = os.listdir(strdirectory)
+            
             for filename in filelist:
-                
-                zf = zipfile.ZipFile( strdirectory + filename, "r")
+            
+                if os.path.splitext(filename)[1] <> ".zip":
+                    print "%s is not zipfile:" % filename
+                    os.remove(strdirectory + filename)
+                    continue
 
-                xmllist = zf.namelist()
-                for xmlfile in xmllist:
-                    if xmlfile.endswith("xbrl") == True :
-                        data = zf.read(xmlfile)
-                        try:
-                            data = zf.read(xmlfile)
-                            p = XMLtoJSON(  input_string=data, indent=True )
-                            data = p.parse()
-                            data = data.lstrip("{\"xbrli:xbrl\":\n")
-                            data = data.replace("}}\n","}\n")                
-                            value = json.loads(data)
-                            db.finance.insert(value)
-                        except:
-                            print filename + ':' + xmlfile +  ':Error'      
-                        
-                zf.close()
-                    
+                try:
+                    zf = zipfile.ZipFile( open(strdirectory + filename,"rb"))
+                    xmllist = zf.namelist()
+                    for xmlfile in xmllist:
+                        if xmlfile.endswith("xbrl") == True :
+                            try:
+                                data = zf.read(xmlfile)
+                                p = XMLtoJSON(  input_string=data, indent=True )
+                                data = p.parse()
+                                data = data.lstrip("{\"xbrli:xbrl\":\n")
+                                data = data.replace("}}\n","}\n")
+                                value = json.loads(data)
+                                db.finance.insert(value)
+                            except:
+                                print filename + ':' + xmlfile +  ':Error'
+                
+                    zf.close()
+                except:
+                    print "%s is broken zip" % filename
+                    os.remove(strdirectory + filename)
+                    continue
+        
+            print strdate + ' done...'
             d = d +  timedelta(days=1)
             strdate = d.strftime("%Y%m%d")
         else:
