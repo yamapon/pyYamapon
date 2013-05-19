@@ -1,8 +1,7 @@
-#日々の個別銘柄（東証）株価データ取得
 
-dataList <- list.files("/Users/admin/Documents/stockdata_t/")
+dataList <- list.files("/Users/admin/Documents/indexdata/")
 
-targetDay <- as.Date(gsub("_tse.csv","",tail(dataList,1)))
+targetDay <- as.Date(gsub("_index.csv","",tail(dataList,1)))
 
 while( targetDay < Sys.Date() ){
   
@@ -10,9 +9,8 @@ while( targetDay < Sys.Date() ){
   #土曜日曜はskip、祝日はデータを読みこんで判定
   if(weekdays(targetDay)  != "土曜日"
      && weekdays(targetDay)  != "日曜日"){
-    
-    URL <- paste( "http://k-db.com/site/download.aspx?date=" , targetDay ,"&p=stockT&download=csv" ,sep ="")
-    
+  
+    URL <- paste( "http://k-db.com/site/download.aspx?date=" , targetDay ,"&p=index&download=csv" ,sep ="")
     dfIndex <- read.csv(URL , header = FALSE ,fileEncoding = "cp932")
     
     if(format(targetDay) == dfIndex[1,1]){
@@ -22,10 +20,11 @@ while( targetDay < Sys.Date() ){
       dfIndex <- na.omit(dfIndex)
       dateData <- matrix( format(targetDay),  length(dfIndex$V1),1)
       dfIndex <- cbind( dateData , dfIndex)
-      
-      write.csv(dfIndex, file=paste("/Users/admin/Documents/stockdata_t/", format(targetDay), "_tse.csv", sep=""),row.names=FALSE )
+
+      write.csv(dfIndex, file=paste("/Users/admin/Documents/indexdata/", format(targetDay), "_index.csv", sep=""),row.names=FALSE )
     }
   }
-  targetDay <- targetDay + 1
   
+  targetDay <- targetDay + 1  
+
 }

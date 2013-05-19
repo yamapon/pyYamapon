@@ -5,15 +5,21 @@ mongo <- mongo.create(db = 'finance')
 if (mongo.is.connected(mongo)){
   buf <- mongo.bson.buffer.create()
   
-  #完全一致での検索方法
+  #完全一致での検索方法（企業コード）
   #mongo.bson.buffer.start.object(buf, "tse-t-ed:SecuritiesCode")
-  #mongo.bson.buffer.append(buf, "#text", "37120")
+  #mongo.bson.buffer.append(buf, "#text", "36550")
   #mongo.bson.buffer.append(buf, "contextRef", "CurrentYearNonConsolidatedInstant")
   #mongo.bson.buffer.finish.object(buf)
+
+  #完全一致での検索方法（提出日）
+  mongo.bson.buffer.start.object(buf, "tse-t-rv:ReportingDateOfFinancialForecastCorrection")
+  mongo.bson.buffer.append(buf, "#text", "2013-05-02")
+  mongo.bson.buffer.append(buf, "contextRef", "CurrentYearConsolidatedInstant")
+  mongo.bson.buffer.finish.object(buf)
   
   #nestされた項目の部分検索方法(サンプル：業績修正データを取得)
-  regex <- mongo.regex.create("tdnet-rvfc.*" , options="i")
-  mongo.bson.buffer.append(buf, "link:schemaRef.xlink:href", regex)
+  #regex <- mongo.regex.create("tdnet-rvfc.*" , options="i")
+  #mongo.bson.buffer.append(buf, "link:schemaRef.xlink:href", regex)
   b <- mongo.bson.from.buffer(buf)
   
   #件数のカウント
@@ -32,18 +38,20 @@ if (mongo.is.connected(mongo)){
     ChangeOperatingIncome <- mongo.bson.value(result, "tse-t-rv:ChangeOperatingIncome")
     ChangeOrdinaryIncome <- mongo.bson.value(result, "tse-t-rv:ChangeOrdinaryIncome")
     ChangeNetIncome <- mongo.bson.value(result, "tse-t-rv:ChangeNetIncome")
-  
+    
+    lst <- mongo.bson.to.list(result)
+    
     #dataframeに挿入する(NULLの場合を考慮する必要あり)
     if( is.null(ChangeNetSales) == FALSE 
         && is.null(ChangeOperatingIncome) == FALSE
         && is.null(ChangeOrdinaryIncome) == FALSE
         && is.null(ChangeNetIncome) == FALSE){
       
-        df <- as.data.frame( list("SecuritiesCode" = SecuritiesCode, 
-                                "ChangeNetSales" = ChangeNetSales, 
-                                "ChangeOperatingIncome" = ChangeOperatingIncome, 
-                                "ChangeOrdinaryIncome" = ChangeOrdinaryIncome, 
-                                "ChangeNetIncome" = ChangeNetIncome))
+#        df <- as.data.frame( list("SecuritiesCode" = SecuritiesCode, 
+#                                "ChangeNetSales" = ChangeNetSales, 
+#                                "ChangeOperatingIncome" = ChangeOperatingIncome, 
+#                                "ChangeOrdinaryIncome" = ChangeOrdinaryIncome, 
+#                                "ChangeNetIncome" = ChangeNetIncome))
               
     }else{
       #NG内容のものを

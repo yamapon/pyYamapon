@@ -311,7 +311,7 @@ DIRECTORY = "/Users/admin/Documents/"
 
 if __name__ == "__main__":
 
-    d = date(2009,1, 7)
+    d = date(2013,5, 11)
 #    d = date.today() - timedelta(days=1)
     strdate = d.strftime("%Y%m%d")
     
